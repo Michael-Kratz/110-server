@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from http import HTTPStatus
 
+
+# -------- Session #1 --------
 app = Flask(__name__)
 
 # http://127.0.0.1:5000/
@@ -78,6 +80,33 @@ def products_count():
     return count
 
 
+# -------- Assignment #2 --------
+@app.route("/api/products", methods=["POST"])
+def create_product():
+    new_product = request.get_json()
+    print(new_product)
+    products.append(new_product)
+    return jsonify(new_product), HTTPStatus.CREATED
+
+
+@app.route("/api/products/<int:id>", methods=["GET"])
+def get_product_by_id(id):
+    for product in products:
+        if product["id"] == id:
+            return jsonify(product), HTTPStatus.OK
+        print(f"product: {product}")
+    return jsonify({"message": "Product not found"}), HTTPStatus.NOT_FOUND
+
+
+@app.route("/api/products/<int:id>", methods=["DELETE"])
+def delete_product(id):
+    for index, product in enumerate(products):
+        if product["id"] == id:
+            products.pop(index)
+            return jsonify({"message": "Product deleted successfully"}), HTTPStatus.NO_CONTENT #204
+    return "testing"
+
+# -------- Session #2 --------
 coupons = [
     {"_id": 1, "code": "WELCOME10", "discount": 10},
     {"_id": 2, "code": "FALL25", "discount": 25},
@@ -98,6 +127,35 @@ def create_coupon():
     print(new_coupon)
     coupons.append(new_coupon)
     return jsonify(new_coupon), HTTPStatus.CREATED
+
+
+# Path parameter
+@app.route("/great/<string:name>", methods=["GET"])
+def great(name):
+    return f"hello {name}", HTTPStatus.OK
+
+
+# GET - get a coupon by id
+@app.route("/api/coupons/<int:id>", methods=["GET"])
+def get_coupon_by_id(id):
+    for coupon in coupons:
+        if coupon["_id"] == id:
+            return jsonify(coupon), HTTPStatus.OK
+        print(f"coupon: {coupon}")
+    return jsonify({"message": "Coupon not found"}), HTTPStatus.NOT_FOUND
+
+
+# UPDATE -
+
+# DELETE - delete a coupon
+@app.route("/api/coupons/<int:id>", methods=["DELETE"])
+def delete_coupon(id):
+    for index, coupon in enumerate(coupons):
+        if coupon["_id"] == id:
+            coupons.pop(index)
+            return jsonify({"message": "Coupon deleted successfully"}), HTTPStatus.NO_CONTENT #204
+    return "testing"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
